@@ -16,7 +16,7 @@ GETTING STARTED
 
 1. Installation
 
-Clone the repository and install dependencies for both the root (backend) and the client:
+Install dependencies for both the root (backend) and the client:
 
 ```bash
 npm install
