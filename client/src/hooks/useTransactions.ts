@@ -5,6 +5,7 @@ import {
   createTransaction,
   updateTransaction,
   deleteTransaction,
+  createTransactionFromAI,
 } from '../services/api';
 
 const useTransactions = () => {
@@ -57,6 +58,18 @@ const useTransactions = () => {
     }
   }, []);
 
+  const addAiTransaction = useCallback(async (prompt: string, userDate?: string) => {
+    setError(null);
+    try {
+      const aiTransaction = await createTransactionFromAI(prompt, userDate);
+      setTransactions((prev) => [aiTransaction, ...prev]);
+      return aiTransaction;
+    } catch (err) {
+      setError('Clarity AI could not add that transaction');
+      throw err;
+    }
+  }, []);
+
   return {
     transactions,
     loading,
@@ -65,6 +78,7 @@ const useTransactions = () => {
     addTransaction,
     editTransaction,
     removeTransaction,
+    addAiTransaction,
   };
 };
 

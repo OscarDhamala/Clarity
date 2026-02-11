@@ -34,6 +34,9 @@ Created a `.env` file in the root directory and the client directory.
 PORT=5050
 MONGO_URI=mongodb+srv://<DB_USER>:<DB_PASSWORD>@cluster.mongodb.net/dbname
 JWT_SECRET=your_secret_key_here
+GEMINI_API_KEY=your_google_gemini_api_key
+# Optional override if you have higher tier access
+# GEMINI_MODEL=gemini-1.5-flash
 
 ```
 ## Client `.env`:
@@ -70,6 +73,7 @@ All transaction routes require a `Bearer <token>` in the Authorization header.
 
 Auth: `POST /api/auth/register`, `POST /api/auth/login`
 Transactions: `GET`, `POST` to `/api/transactions`
+AI Transactions: `POST /api/transactions/ai`
 Management:`PUT`, `DELETE` to `/api/transactions/:id`
 Filtering: `GET` requests support query params: `type`, `category`, `startDate`, and `endDate`.
 
@@ -78,6 +82,7 @@ Filtering: `GET` requests support query params: `type`, `category`, `startDate`,
 KEY FEATURES 
 
 Dynamic Dashboard: Real-time calculation of total income, expenses, and net balance.
+Clarity AI Intake: Describe a transaction ("Spend 1500 on Biryani") and let Gemini auto-classify it from the dashboard.
 Advanced Filtering: Sort through financial history by date ranges or specific categories.
 Secure Auth: Full JWT implementation to ensure data remains private to the user.
 Responsive UI: Fully optimized for desktop and mobile browsers.

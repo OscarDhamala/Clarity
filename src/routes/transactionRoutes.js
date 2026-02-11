@@ -1,6 +1,7 @@
 const express = require('express');
 const Transaction = require('../models/Transaction');
 const authMiddleware = require('../middleware/authMiddleware');
+const { analyzeTransactionPrompt, ClarityAIError } = require('../services/clarityAi');
 
 const router = express.Router();
 
@@ -59,6 +60,45 @@ router.post('/', authMiddleware, async (req, res) => {
     return res.status(201).json({ transaction });
   } catch (error) {
     return res.status(500).json({ message: 'Failed to create transaction' });
+  }
+});
+
+router.post('/ai', authMiddleware, async (req, res) => {
+  const { prompt, userDate } = req.body;
+
+  try {
+    const aiResult = await analyzeTransactionPrompt(prompt);
+    const { raw, date: aiDate, ...transactionFields } = aiResult;
+    const fallbackDate = new Date();
+
+    const resolvedDateString = typeof userDate === 'string' && userDate.trim().length > 0
+      ? userDate.trim()
+      : aiDate;
+
+    let parsedDate = null;
+
+    if (resolvedDateString && /^\d{4}-\d{2}-\d{2}$/.test(resolvedDateString)) {
+      parsedDate = new Date(`${resolvedDateString}T00:00:00`);
+    } else if (resolvedDateString) {
+      const temp = new Date(resolvedDateString);
+      parsedDate = Number.isNaN(temp.getTime()) ? null : temp;
+    }
+
+    const dateValue = parsedDate && !Number.isNaN(parsedDate.getTime()) ? parsedDate : fallbackDate;
+
+    const transaction = await Transaction.create({
+      user: req.user.id,
+      ...transactionFields,
+      date: dateValue,
+    });
+
+    return res.status(201).json({ transaction });
+  } catch (error) {
+    if (error instanceof ClarityAIError) {
+      return res.status(error.statusCode || 400).json({ message: error.message });
+    }
+    console.error('Clarity AI error:', error);
+    return res.status(500).json({ message: 'Clarity AI could not process that entry' });
   }
 });
 

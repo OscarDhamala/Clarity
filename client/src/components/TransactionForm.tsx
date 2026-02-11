@@ -9,7 +9,16 @@ interface TransactionFormProps {
   lockedType?: Transaction['type'];
   title?: string;
   submitLabel?: string;
+  onAiCreate?: (prompt: string, userDate?: string) => Promise<void>;
 }
+
+const AI_SUGGESTIONS = [
+  'Spend 1500 on Biryani',
+  'Spend 2500 on electricity',
+  'Earned 10000 by freelancing',
+] as const;
+
+type AiStatus = 'idle' | 'loading' | 'success' | 'error';
 
 const defaultForm = (type: Transaction['type'] = 'income') => ({
   type,
@@ -27,8 +36,14 @@ const TransactionForm = ({
   lockedType,
   title,
   submitLabel,
+  onAiCreate,
 }: TransactionFormProps) => {
   const [formValues, setFormValues] = useState(defaultForm(lockedType));
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiStatus, setAiStatus] = useState<AiStatus>('idle');
+  const [aiMessage, setAiMessage] = useState('');
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const aiEnabled = Boolean(onAiCreate && !lockedType);
 
   useEffect(() => {
     if (selectedTransaction) {
@@ -44,11 +59,40 @@ const TransactionForm = ({
     }
   }, [selectedTransaction, lockedType]);
 
+  useEffect(() => {
+    if (!aiEnabled || typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const rotation = window.setInterval(() => {
+      setPlaceholderIndex((prev) => (prev + 1) % AI_SUGGESTIONS.length);
+    }, 5000);
+
+    return () => window.clearInterval(rotation);
+  }, [aiEnabled]);
+
+  useEffect(() => {
+    if ((aiStatus === 'success' || aiStatus === 'error') && typeof window !== 'undefined') {
+      const resetTimer = window.setTimeout(() => {
+        setAiStatus('idle');
+        setAiMessage('');
+      }, 4000);
+      return () => window.clearTimeout(resetTimer);
+    }
+    return undefined;
+  }, [aiStatus]);
+
   const handleChange = (
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = event.target;
     setFormValues((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAiPromptChange = (
+    event: ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setAiPrompt(event.target.value);
   };
 
   const handleSubmit = async (event: FormEvent) => {
@@ -68,6 +112,37 @@ const TransactionForm = ({
       await onCreate(payload);
     }
     setFormValues(defaultForm(lockedType));
+  };
+
+  const handleAiSubmit = async () => {
+    if (!onAiCreate) {
+      return;
+    }
+
+    const trimmedPrompt = aiPrompt.trim();
+    if (!trimmedPrompt) {
+      setAiStatus('error');
+      setAiMessage('Describe the transaction so Clarity AI can help.');
+      return;
+    }
+
+    try {
+      setAiStatus('loading');
+      setAiMessage('Letting Clarity AI work...');
+      const now = new Date();
+      const localISODate = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+        .toISOString()
+        .split('T')[0];
+
+      await onAiCreate(trimmedPrompt, localISODate);
+      setAiStatus('success');
+      setAiMessage('Added automatically to your history.');
+      setAiPrompt('');
+    } catch (error) {
+      const fallbackMessage = error instanceof Error ? error.message : 'Clarity AI could not understand that note.';
+      setAiStatus('error');
+      setAiMessage(fallbackMessage);
+    }
   };
 
   return (
@@ -143,6 +218,42 @@ const TransactionForm = ({
           {submitLabel || (selectedTransaction ? 'Update' : 'Add')}
         </button>
       </div>
+
+      {aiEnabled && (
+        <section className="clarity-ai-card" aria-live="polite">
+          <div className="ai-header">
+            <div>
+              <p className="ai-pill">Clarity AI</p>
+              <h4>Let AI work</h4>
+              <p className="muted">
+                Drop a quick idea like "Spend 1500 on Biryani" and we&apos;ll detect the type, category, amount, and date for you.
+              </p>
+            </div>
+            <span className="ai-chip">Auto</span>
+          </div>
+
+          <div className="ai-input-row">
+            <textarea
+              name="clarityAiPrompt"
+              rows={3}
+              value={aiPrompt}
+              onChange={handleAiPromptChange}
+              placeholder={AI_SUGGESTIONS[placeholderIndex]}
+              disabled={aiStatus === 'loading'}
+            />
+            <button
+              type="button"
+              className="primary-btn ai-btn"
+              onClick={handleAiSubmit}
+              disabled={aiStatus === 'loading'}
+            >
+              {aiStatus === 'loading' ? 'Working...' : 'Let AI work'}
+            </button>
+          </div>
+
+          {aiMessage && <p className={`ai-status ${aiStatus}`}>{aiMessage}</p>}
+        </section>
+      )}
     </form>
   );
 };

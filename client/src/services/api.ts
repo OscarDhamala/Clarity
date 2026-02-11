@@ -49,6 +49,17 @@ export const createTransaction = async (
   return response.data.transaction;
 };
 
+export const createTransactionFromAI = async (
+  prompt: string,
+  userDate?: string
+): Promise<Transaction> => {
+  const response = await api.post<{ transaction: Transaction }>(
+    '/api/transactions/ai',
+    { prompt, userDate }
+  );
+  return response.data.transaction;
+};
+
 export const updateTransaction = async (
   id: string,
   updates: Partial<Transaction>

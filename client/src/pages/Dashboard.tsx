@@ -38,6 +38,7 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
     addTransaction,
     editTransaction,
     removeTransaction,
+    addAiTransaction,
   } = useTransactions();
   const [theme, setTheme] = useState<'light' | 'dark'>(() => getStoredTheme());
 
@@ -125,6 +126,7 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
                 addTransaction={addTransaction}
                 editTransaction={editTransaction}
                 removeTransaction={removeTransaction}
+                addAiTransaction={addAiTransaction}
               />
             }
           />
@@ -174,6 +176,7 @@ interface OverviewViewProps {
   addTransaction: (transaction: Omit<Transaction, '_id'>) => Promise<void> | void;
   editTransaction: (id: string, transaction: Omit<Transaction, '_id'>) => Promise<void> | void;
   removeTransaction: (id: string) => Promise<void> | void;
+  addAiTransaction: (prompt: string, userDate?: string) => Promise<Transaction>;
 }
 
 const OverviewView = ({
@@ -184,6 +187,7 @@ const OverviewView = ({
   addTransaction,
   editTransaction,
   removeTransaction,
+  addAiTransaction,
 }: OverviewViewProps) => {
   const navigate = useNavigate();
   const [filters, setFilters] = useState<TransactionFilters>({});
@@ -222,6 +226,11 @@ const OverviewView = ({
     await loadTransactions();
   };
 
+  const handleAiCreate = async (prompt: string, userDate?: string) => {
+    await addAiTransaction(prompt, userDate);
+    await loadTransactions();
+  };
+
   return (
     <>
       <SummaryCards transactions={filteredTransactions} />
@@ -232,6 +241,7 @@ const OverviewView = ({
           onCreate={handleCreate}
           onUpdate={handleUpdate}
           onCancelEdit={() => setSelectedTransaction(null)}
+          onAiCreate={handleAiCreate}
         />
 
         <section className="transactions-panel">
