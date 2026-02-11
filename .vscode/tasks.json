@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Backend: npm run dev",
+      "type": "shell",
+      "command": "npm run dev",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Frontend: npm run client",
+      "type": "shell",
+      "command": "npm run client",
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
+}
