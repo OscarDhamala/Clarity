@@ -64,7 +64,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard"
+          path="/dashboard/*"
           element={
             authState.token && authState.user ? (
               <Dashboard user={authState.user} onLogout={handleLogout} />

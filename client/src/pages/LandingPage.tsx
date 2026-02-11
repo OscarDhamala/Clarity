@@ -41,6 +41,10 @@ const LandingPage = ({ onAuthSuccess, isLoggedIn, userName }: LandingPageProps) 
       </section>
 
       <section className="landing-form">
+        <h2>Login or register</h2>
+        <p className="form-subtitle">
+          Securely access Clarity, add new entries, and keep every NPR accounted for.
+        </p>
         <AuthPanel onAuthSuccess={onAuthSuccess} />
       </section>
     </main>

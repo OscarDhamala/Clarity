@@ -1,5 +1,10 @@
 import { Transaction } from '../types';
 
+const currencyFormatter = new Intl.NumberFormat('ne-NP', {
+  style: 'currency',
+  currency: 'NPR',
+});
+
 interface TransactionListProps {
   transactions: Transaction[];
   onEdit: (transaction: Transaction) => void;
@@ -16,7 +21,7 @@ const TransactionList = ({ transactions, onEdit, onDelete }: TransactionListProp
       {transactions.map((transaction, index) => (
         <div
           key={transaction._id || `${transaction.date}-${transaction.category}-${index}`}
-          className="transaction-card"
+          className={`transaction-card ${transaction.type}`}
         >
           <div>
             <p className="transaction-category">{transaction.category}</p>
@@ -24,7 +29,8 @@ const TransactionList = ({ transactions, onEdit, onDelete }: TransactionListProp
           </div>
           <div className="transaction-meta">
             <span className={transaction.type === 'income' ? 'income' : 'expense'}>
-              {transaction.type === 'income' ? '+' : '-'}${Number(transaction.amount).toFixed(2)}
+              {transaction.type === 'income' ? '+' : '-'}
+              {currencyFormatter.format(Number(transaction.amount))}
             </span>
             <small>{new Date(transaction.date).toLocaleDateString()}</small>
           </div>

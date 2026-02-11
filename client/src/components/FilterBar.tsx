@@ -45,7 +45,7 @@ const FilterBar = ({ filters, onChange, onApply, onClear }: FilterBarProps) => {
         onChange={handleInputChange}
       />
 
-      <button type="button" className="secondary-btn" onClick={onApply}>
+      <button type="button" className="primary-btn" onClick={onApply}>
         Apply
       </button>
       <button type="button" className="ghost-btn" onClick={onClear}>

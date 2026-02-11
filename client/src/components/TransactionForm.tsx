@@ -6,10 +6,13 @@ interface TransactionFormProps {
   onCreate: (transaction: Omit<Transaction, '_id'>) => Promise<void> | void;
   onUpdate: (id: string, transaction: Omit<Transaction, '_id'>) => Promise<void> | void;
   onCancelEdit: () => void;
+  lockedType?: Transaction['type'];
+  title?: string;
+  submitLabel?: string;
 }
 
-const defaultForm = () => ({
-  type: 'income',
+const defaultForm = (type: Transaction['type'] = 'income') => ({
+  type,
   amount: '',
   category: '',
   date: new Date().toISOString().split('T')[0],
@@ -21,22 +24,25 @@ const TransactionForm = ({
   onCreate,
   onUpdate,
   onCancelEdit,
+  lockedType,
+  title,
+  submitLabel,
 }: TransactionFormProps) => {
-  const [formValues, setFormValues] = useState(defaultForm());
+  const [formValues, setFormValues] = useState(defaultForm(lockedType));
 
   useEffect(() => {
     if (selectedTransaction) {
       setFormValues({
-        type: selectedTransaction.type,
+        type: lockedType ?? selectedTransaction.type,
         amount: String(selectedTransaction.amount),
         category: selectedTransaction.category,
         date: selectedTransaction.date.split('T')[0],
         note: selectedTransaction.note || '',
       });
     } else {
-      setFormValues(defaultForm());
+      setFormValues(defaultForm(lockedType));
     }
-  }, [selectedTransaction]);
+  }, [selectedTransaction, lockedType]);
 
   const handleChange = (
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -49,7 +55,7 @@ const TransactionForm = ({
     event.preventDefault();
 
     const payload = {
-      type: formValues.type as Transaction['type'],
+      type: (lockedType ?? formValues.type) as Transaction['type'],
       amount: Number(formValues.amount),
       category: formValues.category,
       date: formValues.date,
@@ -61,62 +67,63 @@ const TransactionForm = ({
     } else {
       await onCreate(payload);
     }
-
-    setFormValues(defaultForm());
+    setFormValues(defaultForm(lockedType));
   };
 
   return (
     <form className="transaction-form" onSubmit={handleSubmit}>
-      <h3>{selectedTransaction ? 'Edit transaction' : 'Add a transaction'}</h3>
+      <h3>{title || (selectedTransaction ? 'Edit transaction' : 'Add a transaction')}</h3>
 
-      <div className="form-row">
-        <label>
-          <span>Type</span>
+      <label className="form-field">
+        <span>Type</span>
+        {lockedType ? (
+          <div className={`type-pill ${lockedType}`}>
+            {lockedType === 'income' ? 'Income' : 'Expense'}
+          </div>
+        ) : (
           <select name="type" value={formValues.type} onChange={handleChange}>
             <option value="income">Income</option>
             <option value="expense">Expense</option>
           </select>
-        </label>
+        )}
+      </label>
 
-        <label>
-          <span>Amount</span>
-          <input
-            type="number"
-            name="amount"
-            min="0"
-            step="0.01"
-            value={formValues.amount}
-            onChange={handleChange}
-            required
-          />
-        </label>
-      </div>
+      <label className="form-field">
+        <span>Amount</span>
+        <input
+          type="number"
+          name="amount"
+          min="0"
+          step="0.01"
+          value={formValues.amount}
+          onChange={handleChange}
+          required
+        />
+      </label>
 
-      <div className="form-row">
-        <label>
-          <span>Category</span>
-          <input
-            name="category"
-            value={formValues.category}
-            onChange={handleChange}
-            placeholder="Groceries, Salary, Rent..."
-            required
-          />
-        </label>
+      <label className="form-field">
+        <span>Category</span>
+        <input
+          name="category"
+          value={formValues.category}
+          onChange={handleChange}
+          placeholder="Groceries, Salary, Rent..."
+          required
+        />
+      </label>
 
-        <label>
-          <span>Date</span>
-          <input
-            type="date"
-            name="date"
-            value={formValues.date}
-            onChange={handleChange}
-            required
-          />
-        </label>
-      </div>
+      <label className="form-field">
+        <span>Date</span>
+        <input
+          type="date"
+          name="date"
+          value={formValues.date}
+          onChange={handleChange}
+          required
+        />
+      </label>
 
-      <label>
+      <label className="form-field">
         <span>Note</span>
         <input
           name="note"
@@ -133,7 +140,7 @@ const TransactionForm = ({
           </button>
         )}
         <button className="primary-btn" type="submit">
-          {selectedTransaction ? 'Update' : 'Add'}
+          {submitLabel || (selectedTransaction ? 'Update' : 'Add')}
         </button>
       </div>
     </form>

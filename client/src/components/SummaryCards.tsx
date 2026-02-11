@@ -1,5 +1,10 @@
 import { Transaction } from '../types';
 
+const currencyFormatter = new Intl.NumberFormat('ne-NP', {
+  style: 'currency',
+  currency: 'NPR',
+});
+
 interface SummaryCardsProps {
   transactions: Transaction[];
 }
@@ -26,7 +31,7 @@ const SummaryCards = ({ transactions }: SummaryCardsProps) => {
       {cards.map((card) => (
         <div key={card.label} className={`summary-card ${card.accent}`}>
           <p>{card.label}</p>
-          <strong>${card.value.toFixed(2)}</strong>
+          <strong>{currencyFormatter.format(card.value)}</strong>
         </div>
       ))}
     </div>
