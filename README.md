@@ -32,7 +32,7 @@ Created a `.env` file in the root directory and the client directory.
 
 ```text
 PORT=5050
-MONGO_URI=mongodb+srv://oscardhamala117_db_user:pK8eelUnKT07MPsM@claritydb.nvkjn0o.mongodb.net/?appName=ClarityDB
+MONGO_URI=mongodb+srv://<DB_USER>:<DB_PASSWORD>@cluster.mongodb.net/dbname
 JWT_SECRET=your_secret_key_here
 
 ```
