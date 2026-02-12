@@ -4,4 +4,3 @@ client/build/
 .env
 client/.env
 .DS_Store
-.github/copilot-instructions.md

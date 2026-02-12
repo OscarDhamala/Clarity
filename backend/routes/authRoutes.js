@@ -5,6 +5,32 @@ const User = require('../models/User');
 
 const router = express.Router();
 
+// Server side validation for password strength
+const validatePassword = (password) => {
+  const errors = [];
+  
+  if (!password || password.length < 8) {
+    errors.push('Password must be at least 8 characters long');
+  }
+  if (!/[A-Z]/.test(password)) {
+    errors.push('Password must contain at least one uppercase letter');
+  }
+  if (!/[a-z]/.test(password)) {
+    errors.push('Password must contain at least one lowercase letter');
+  }
+  if (!/[0-9]/.test(password)) {
+    errors.push('Password must contain at least one number');
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    errors.push('Password must contain at least one special character');
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
+
 const createToken = (userId) => {
   const secret = process.env.JWT_SECRET;
   if (!secret) {
@@ -14,12 +40,21 @@ const createToken = (userId) => {
   return jwt.sign({ id: userId }, secret, { expiresIn: '7d' });
 };
 
-// Register a new user
+// New user
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
     return res.status(400).json({ message: 'Name, email, and password are required' });
+  }
+
+  // PASSWORD VALIDATION HERE - this is important to ensure strong passwords and enhance security
+  const passwordValidation = validatePassword(password);
+  if (!passwordValidation.isValid) {
+    return res.status(400).json({ 
+      message: 'Password validation failed',
+      errors: passwordValidation.errors 
+    });
   }
 
   try {
@@ -40,11 +75,12 @@ router.post('/register', async (req, res) => {
       token: createToken(user._id),
     });
   } catch (error) {
+    console.error('Registration error:', error);
     return res.status(500).json({ message: 'Failed to register user' });
   }
 });
 
-// Log a user in
+// Log in User
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -72,6 +108,7 @@ router.post('/login', async (req, res) => {
       token: createToken(user._id),
     });
   } catch (error) {
+    console.error('Login error:', error);
     return res.status(500).json({ message: 'Failed to log in' });
   }
 });

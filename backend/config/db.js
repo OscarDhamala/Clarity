@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// Simple helper to connect to MongoDB with helpful console output
 const connectDB = async () => {
   const uri = process.env.MONGO_URI;
 

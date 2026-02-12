@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { NavLink, Route, Routes, useNavigate } from 'react-router-dom';
+import { NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import FilterBar from '../components/FilterBar';
 import SummaryCards from '../components/SummaryCards';
 import TransactionForm from '../components/TransactionForm';
@@ -40,7 +40,9 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
     removeTransaction,
     addAiTransaction,
   } = useTransactions();
+  const location = useLocation();
   const [theme, setTheme] = useState<'light' | 'dark'>(() => getStoredTheme());
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (typeof document === 'undefined') {
@@ -59,13 +61,35 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
+  const closeSidebar = () => setSidebarOpen(false);
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
+
   useEffect(() => {
     loadTransactions();
   }, [loadTransactions]);
 
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const handleResize = () => {
+      if (window.innerWidth > 960) {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <div className="dashboard-shell">
-      <aside className="dashboard-sidebar">
+    <div className={`dashboard-shell${sidebarOpen ? ' sidebar-open' : ''}`}>
+      <aside id="dashboard-sidebar" className="dashboard-sidebar">
         <div className="sidebar-header">
           <div className="brand-mark">
             <div className="brand-icon">CL</div>
@@ -73,16 +97,26 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
               <span>CLARITY</span>
             </div>
           </div>
-          <button
-            type="button"
-            className={`theme-toggle${theme === 'dark' ? ' active' : ''}`}
-            aria-label="Toggle dark theme"
-            onClick={toggleTheme}
-          >
-            <span className="toggle-track">
-              <span className="toggle-thumb" />
-            </span>
-          </button>
+          <div className="sidebar-header-actions">
+            <button
+              type="button"
+              className={`theme-toggle${theme === 'dark' ? ' active' : ''}`}
+              aria-label="Toggle dark theme"
+              onClick={toggleTheme}
+            >
+              <span className="toggle-track">
+                <span className="toggle-thumb" />
+              </span>
+            </button>
+            <button
+              type="button"
+              className="sidebar-dismiss"
+              aria-label="Close navigation"
+              onClick={closeSidebar}
+            >
+              <span />
+            </button>
+          </div>
         </div>
 
         <nav className="sidebar-nav">
@@ -92,11 +126,19 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
               to={item.to}
               end={item.to === '/dashboard'}
               className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+              onClick={closeSidebar}
             >
               <span>{item.label}</span>
             </NavLink>
           ))}
-          <button type="button" className="nav-link logout" onClick={onLogout}>
+          <button
+            type="button"
+            className="nav-link logout"
+            onClick={() => {
+              closeSidebar();
+              onLogout();
+            }}
+          >
             Logout
           </button>
         </nav>
@@ -113,7 +155,25 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
 
       </aside>
 
+      <div className="dashboard-overlay" aria-hidden="true" onClick={closeSidebar} />
+
       <main className="dashboard-main">
+        <div className="mobile-top-bar">
+          <button
+            type="button"
+            className="mobile-menu-btn"
+            aria-label="Toggle navigation"
+            aria-controls="dashboard-sidebar"
+            aria-expanded={sidebarOpen}
+            onClick={toggleSidebar}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+          <span className="mobile-top-title">Clarity</span>
+        </div>
+
         <Routes>
           <Route
             index

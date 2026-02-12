@@ -10,7 +10,7 @@ const transactionRoutes = require('./routes/transactionRoutes');
 dotenv.config({ path: path.resolve(__dirname, '../.env'), override: true });
 const app = express();
 
-// Connect to MongoDB as soon as the app starts
+// Connection to MongoDB as soon as the app starts
 connectDB();
 
 // Global middleware
@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 
-// Handle unknown routes so the client gets a clear message
+// Handling of unknown routes so the client gets a clear message
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });

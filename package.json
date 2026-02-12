@@ -2,10 +2,10 @@
   "name": "clarity",
   "version": "1.0.0",
   "description": "Simple personal finance tracker backend",
-  "main": "src/server.js",
+  "main": "backend/server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
     "client": "npm start --prefix client",
     "client:build": "npm run build --prefix client"
   },
@@ -23,6 +23,7 @@
     "morgan": "^1.10.1"
   },
   "devDependencies": {
+    "@types/node": "^25.2.3",
     "nodemon": "^3.1.11"
   }
 }

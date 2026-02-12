@@ -1,4 +1,4 @@
-import { ChangeEvent, SubmitEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEventHandler, useEffect, useState } from 'react';
 import { loginUser, registerUser } from '../services/api';
 import { AuthResponse } from '../types';
 
@@ -21,7 +21,10 @@ const AuthPanel = ({ onAuthSuccess }: AuthPanelProps) => {
     setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
+  const passwordPolicy =
+    'Password must be of at least 6 characters and include 1 uppercase letter and 1 number.';
+
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     setError('');
     setIsSubmitting(true);
@@ -30,6 +33,12 @@ const AuthPanel = ({ onAuthSuccess }: AuthPanelProps) => {
       let response: AuthResponse;
 
       if (mode === 'register') {
+        const policyRegex = /^(?=.*[A-Z])(?=.*\d).{6,}$/;
+        if (!policyRegex.test(formValues.password)) {
+          setError(passwordPolicy);
+          setIsSubmitting(false);
+          return;
+        }
         response = await registerUser(formValues);
       } else {
         response = await loginUser({
@@ -40,7 +49,7 @@ const AuthPanel = ({ onAuthSuccess }: AuthPanelProps) => {
 
       onAuthSuccess(response);
     } catch (err) {
-      setError('Please recheck your details and try again.');
+      setError('Recheck your details and try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -87,7 +96,7 @@ const AuthPanel = ({ onAuthSuccess }: AuthPanelProps) => {
           <input
             name="email"
             type="email"
-            placeholder="you@example.com"
+            placeholder="name@gmail.com"
             value={formValues.email}
             onChange={handleChange}
             required
@@ -103,7 +112,11 @@ const AuthPanel = ({ onAuthSuccess }: AuthPanelProps) => {
             value={formValues.password}
             onChange={handleChange}
             required
+            minLength={6}
+            pattern={isRegister ? '^(?=.*[A-Z])(?=.*\\d).{6,}$' : undefined}
+            title={passwordPolicy}
           />
+          {isRegister && <small className="input-hint">{passwordPolicy}</small>}
         </label>
 
         {error && <p className="error-text">{error}</p>}

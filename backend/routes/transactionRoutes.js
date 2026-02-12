@@ -5,7 +5,7 @@ const { analyzeTransactionPrompt, ClarityAIError } = require('../services/clarit
 
 const router = express.Router();
 
-// Get all transactions for the logged-in user with optional filters
+// All transactions for the logged-in user with optional filters
 router.get('/', authMiddleware, async (req, res) => {
   const { type, category, startDate, endDate } = req.query;
   const filters = { user: req.user.id };

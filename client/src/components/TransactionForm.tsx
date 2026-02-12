@@ -147,6 +147,38 @@ const TransactionForm = ({
 
   return (
     <form className="transaction-form" onSubmit={handleSubmit}>
+      {aiEnabled && (
+        <section className="clarity-ai-card" aria-live="polite">
+          <div className="ai-header">
+            <div>
+              <p className="ai-pill">Clarity AI</p>
+            </div>
+            <span className="ai-chip">Auto</span>
+          </div>
+
+          <div className="ai-input-row">
+            <textarea
+              name="clarityAiPrompt"
+              rows={1}
+              value={aiPrompt}
+              onChange={handleAiPromptChange}
+              placeholder={AI_SUGGESTIONS[placeholderIndex]}
+              disabled={aiStatus === 'loading'}
+            />
+            <button
+              type="button"
+              className="primary-btn ai-btn"
+              onClick={handleAiSubmit}
+              disabled={aiStatus === 'loading'}
+            >
+              {aiStatus === 'loading' ? 'Working...' : 'Let AI work'}
+            </button>
+          </div>
+
+          {aiMessage && <p className={`ai-status ${aiStatus}`}>{aiMessage}</p>}
+        </section>
+      )}
+
       <h3>{title || (selectedTransaction ? 'Edit transaction' : 'Add a transaction')}</h3>
 
       <label className="form-field">
@@ -169,7 +201,7 @@ const TransactionForm = ({
           type="number"
           name="amount"
           min="0"
-          step="0.01"
+          step="1000"
           value={formValues.amount}
           onChange={handleChange}
           required
@@ -218,42 +250,6 @@ const TransactionForm = ({
           {submitLabel || (selectedTransaction ? 'Update' : 'Add')}
         </button>
       </div>
-
-      {aiEnabled && (
-        <section className="clarity-ai-card" aria-live="polite">
-          <div className="ai-header">
-            <div>
-              <p className="ai-pill">Clarity AI</p>
-              <h4>Let AI work</h4>
-              <p className="muted">
-                Drop a quick idea like "Spend 1500 on Biryani" and we&apos;ll detect the type, category, amount, and date for you.
-              </p>
-            </div>
-            <span className="ai-chip">Auto</span>
-          </div>
-
-          <div className="ai-input-row">
-            <textarea
-              name="clarityAiPrompt"
-              rows={3}
-              value={aiPrompt}
-              onChange={handleAiPromptChange}
-              placeholder={AI_SUGGESTIONS[placeholderIndex]}
-              disabled={aiStatus === 'loading'}
-            />
-            <button
-              type="button"
-              className="primary-btn ai-btn"
-              onClick={handleAiSubmit}
-              disabled={aiStatus === 'loading'}
-            >
-              {aiStatus === 'loading' ? 'Working...' : 'Let AI work'}
-            </button>
-          </div>
-
-          {aiMessage && <p className={`ai-status ${aiStatus}`}>{aiMessage}</p>}
-        </section>
-      )}
     </form>
   );
 };
