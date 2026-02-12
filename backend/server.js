@@ -12,10 +12,9 @@ dotenv.config({ path: path.resolve(__dirname, '../.env'), override: true });
 
 const app = express();
 
-// MongoDB connection
 connectDB();
 
-// CORS SECTION
+// CORS Update
 const allowedOrigins = [
   'http://localhost:3000',           
   'https://clarity-oscar.vercel.app' // Live Vercel Deployment Domain
@@ -31,7 +30,7 @@ app.use(cors({
       callback(new Error('Blocked by CORS policy: This origin is not allowed.'));
     }
   },
-  credentials: true, // Required for sending cookies/auth headers
+  credentials: true, //for sending cookies/auth headers
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));

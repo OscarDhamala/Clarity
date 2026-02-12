@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { ChangeEvent, FormEventHandler, useEffect, useState } from 'react';
 import { loginUser, registerUser } from '../services/api';
 import { AuthResponse } from '../types';
@@ -22,7 +23,7 @@ const AuthPanel = ({ onAuthSuccess }: AuthPanelProps) => {
   };
 
   const passwordPolicy =
-    'Password must be of at least 6 characters and include 1 uppercase letter and 1 number.';
+    'Password must be at least 8 characters and include uppercase, lowercase, number, and special character.';
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
@@ -33,7 +34,7 @@ const AuthPanel = ({ onAuthSuccess }: AuthPanelProps) => {
       let response: AuthResponse;
 
       if (mode === 'register') {
-        const policyRegex = /^(?=.*[A-Z])(?=.*\d).{6,}$/;
+        const policyRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
         if (!policyRegex.test(formValues.password)) {
           setError(passwordPolicy);
           setIsSubmitting(false);
@@ -49,7 +50,14 @@ const AuthPanel = ({ onAuthSuccess }: AuthPanelProps) => {
 
       onAuthSuccess(response);
     } catch (err) {
-      setError('Recheck your details and try again.');
+      if (axios.isAxiosError(err)) {
+        const apiMessage =
+          (Array.isArray(err.response?.data?.errors) && err.response?.data?.errors.join(' ')) ||
+          err.response?.data?.message;
+        setError(apiMessage || 'Recheck your details and try again.');
+      } else {
+        setError('Recheck your details and try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -108,12 +116,16 @@ const AuthPanel = ({ onAuthSuccess }: AuthPanelProps) => {
           <input
             name="password"
             type="password"
-            placeholder="At least 6 characters"
+            placeholder="At least 8 characters"
             value={formValues.password}
             onChange={handleChange}
             required
-            minLength={6}
-            pattern={isRegister ? '^(?=.*[A-Z])(?=.*\\d).{6,}$' : undefined}
+            minLength={8}
+            pattern={
+              isRegister
+                ? '^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$'
+                : undefined
+            }
             title={passwordPolicy}
           />
           {isRegister && <small className="input-hint">{passwordPolicy}</small>}
