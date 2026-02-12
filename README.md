@@ -1,3 +1,7 @@
+⚡ Note on Loading Time
+The CLARITY is hosted on Render (Backend) and uses a free hosting tier. If the app has been inactive 15 minutes, the first request will trigger a "spin-up," which can take 30–60 seconds to load. 
+Thank you for your patience !!
+
 
 "CLARITY", a full-stack personal finance tracker that keeps income, expenses, AI-assisted categorization, and visual insights in one place.
 
