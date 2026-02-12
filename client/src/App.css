@@ -322,15 +322,22 @@ body.theme-dark .input-hint {
 }
 
 .brand-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 8px;
-  background: var(--color-midnight);
-  color: #fff;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
   display: grid;
   place-items: center;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  background: transparent;
+  padding: 0;
+  overflow: hidden;
+}
+
+.brand-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .sidebar-user {

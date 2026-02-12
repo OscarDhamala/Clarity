@@ -1,5 +1,5 @@
 
-GOAL: Build "Clarity", a full-stack personal finance tracker that keeps income, expenses, AI-assisted categorization, and visual insights in one place.
+"CLARITY", a full-stack personal finance tracker that keeps income, expenses, AI-assisted categorization, and visual insights in one place.
 
 1. STACK CHOICES: 
   - Backend: Node.js + Express + MongoDB (Mongoose) for rapid REST APIs with flexible schema evolution.
@@ -109,7 +109,7 @@ Why this approach?? We needed fast iteration with a single-language (TypeScript/
     - Mobile nav overlay + accessible aria attributes.
 
     
-    5. Workflow & Tooling
+5. Workflow & Tooling
     - Scripts:
     - `npm run dev` (backend via nodemon).
     - `npm run client` (CRA dev server).
@@ -117,7 +117,7 @@ Why this approach?? We needed fast iteration with a single-language (TypeScript/
     - Environment separation (root `.env`, client `.env`).
 
     
-    6. Security & Quality Choices
+6. Security & Quality Choices
     - JWT auth with server-side verification on every transaction route.
     - Password policy enforced both client & server, with server as source of truth.
     - Mongoose validation stops invalid data.
@@ -125,20 +125,24 @@ Why this approach?? We needed fast iteration with a single-language (TypeScript/
     - Axios intercept-like pattern with `setAuthToken` ensures headers stay in sync with stored token.
 
 
-    7. KEY FEATURES
+7. KEY FEATURES
 
-        Dynamic Dashboard: Real-time calculation of total income, expenses, and net balance.
-        Clarity AI Intake: Describe a transaction ("Spend 1500 on Biryani") and let Gemini auto-classify it from the dashboard.
-        Advanced Filtering: Sort through financial history by date ranges or specific categories.
-        Secure Auth: Full JWT implementation to ensure data remains private to the user.
-        Responsive UI: Fully optimized for desktop and mobile browsers. 
+    Dynamic Dashboard: Real-time calculation of total income, expenses, and net balance.
+    Clarity AI Intake: Describe a transaction ("Spend 1500 on Biryani") and let Gemini auto-classify it from the dashboard.
+    Advanced Filtering: Sort through financial history by date ranges or specific categories.
+    Secure Auth: Full JWT implementation to ensure data remains private to the user.
+    Responsive UI: Fully optimized for desktop and mobile browsers. 
 
 
-    8. Final Checklist
+8. Final Checklist
     - [x] Backend routes tested locally.
     - [x] Password policy enforced on both client and server.
     - [x] AI endpoint limited to authenticated users, handles edge cases.
     - [x] README updated.
+
+
+9. Deployment and Live Website
+    - The CLARITY Web App is Deployed in Vercel and Render.
 
 
 

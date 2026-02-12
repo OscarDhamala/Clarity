@@ -92,7 +92,9 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
       <aside id="dashboard-sidebar" className="dashboard-sidebar">
         <div className="sidebar-header">
           <div className="brand-mark">
-            <div className="brand-icon">CL</div>
+            <div className="brand-icon">
+              <img src="/Clarity-Logo.png" alt="Clarity logo" />
+            </div>
             <div>
               <span>CLARITY</span>
             </div>
